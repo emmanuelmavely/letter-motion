@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multilingual Text Animator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .video-frame {
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .input-container {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+        
+        .input-container input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 15px 20px;
+            font-size: 18px;
+            border-radius: 10px;
+            outline: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .input-container input:focus {
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .input-container button {
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+            border: none;
+            color: white;
+            padding: 15px 25px;
+            font-size: 18px;
+            border-radius: 10px;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .input-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+        }
+        
+        .text-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            height: 200px;
+        }
+        
+        .letter {
+            font-size: 120px;
+            font-weight: bold;
+            color: white;
+            opacity: 0;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .letter.active {
+            opacity: 1;
+        }
+        
+        .letter.final {
+            color: white;
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+        }
+        
+        .instructions {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-frame">
+        <div class="input-container">
+            <input type="text" id="wordInput" placeholder="Enter a word (e.g., AKHIL)" maxlength="15">
+            <button onclick="startAnimation()">Animate</button>
+        </div>
+        
+        <div class="text-display" id="textDisplay">
+        </div>
+        
+        <div class="instructions">
+            Enter a word above and click "Animate" to see each letter cycle through different languages
+        </div>
+    </div>
+
+    <script>
+        // Character mappings for different languages/scripts
+        const languageMappings = {
+            'A': ['А', 'Α', '阿', 'あ', 'آ', 'अ', 'ا', 'Ā', 'A'],
+            'B': ['Б', 'Β', '比', 'び', 'ب', 'ब', 'ب', 'B', 'B'],
+            'C': ['Ц', 'Γ', '西', 'し', 'ج', 'च', 'ج', 'C', 'C'],
+            'D': ['Д', 'Δ', '德', 'で', 'د', 'द', 'د', 'D', 'D'],
+            'E': ['Е', 'Ε', '伊', 'え', 'ع', 'ए', 'ع', 'E', 'E'],
+            'F': ['Ф', 'Φ', '福', 'ふ', 'ف', 'फ', 'ف', 'F', 'F'],
+            'G': ['Г', 'Γ', '格', 'が', 'غ', 'ग', 'غ', 'G', 'G'],
+            'H': ['Х', 'Η', '华', 'は', 'ه', 'ह', 'ه', 'H', 'H'],
+            'I': ['И', 'Ι', '伊', 'い', 'ي', 'इ', 'ي', 'I', 'I'],
+            'J': ['Й', 'Ι', '杰', 'じ', 'ج', 'ज', 'ج', 'J', 'J'],
+            'K': ['К', 'Κ', '克', 'か', 'ك', 'क', 'ك', 'K', 'K'],
+            'L': ['Л', 'Λ', '艾', 'ら', 'ل', 'ल', 'ل', 'L', 'L'],
+            'M': ['М', 'Μ', '艾', 'ま', 'م', 'म', 'م', 'M', 'M'],
+            'N': ['Н', 'Ν', '艾', 'な', 'ن', 'न', 'ن', 'N', 'N'],
+            'O': ['О', 'Ο', '欧', 'お', 'و', 'ओ', 'و', 'O', 'O'],
+            'P': ['П', 'Π', '皮', 'ぱ', 'ب', 'प', 'ب', 'P', 'P'],
+            'Q': ['Ку', 'Ψ', '求', 'く', 'ق', 'क्यू', 'ق', 'Q', 'Q'],
+            'R': ['Р', 'Ρ', '阿', 'ら', 'ر', 'र', 'ر', 'R', 'R'],
+            'S': ['С', 'Σ', '艾', 'さ', 'س', 'स', 'س', 'S', 'S'],
+            'T': ['Т', 'Τ', '提', 'た', 'ت', 'त', 'ت', 'T', 'T'],
+            'U': ['У', 'Υ', '优', 'う', 'و', 'उ', 'و', 'U', 'U'],
+            'V': ['В', 'Β', '维', 'ば', 'ف', 'व', 'ف', 'V', 'V'],
+            'W': ['В', 'Ω', '达', 'わ', 'و', 'व', 'و', 'W', 'W'],
+            'X': ['Х', 'Χ', '西', 'くす', 'خ', 'एक्स', 'خ', 'X', 'X'],
+            'Y': ['У', 'Υ', '威', 'わい', 'ي', 'वाई', 'ي', 'Y', 'Y'],
+            'Z': ['З', 'Ζ', '泽', 'ぜ', 'ز', 'जेड', 'ز', 'Z', 'Z']
+        };
+
+        let currentAnimating = false;
+
+        function startAnimation() {
+            if (currentAnimating) return;
+            
+            const input = document.getElementById('wordInput');
+            const word = input.value.toUpperCase().trim();
+            
+            if (!word) {
+                alert('Please enter a word');
+                return;
+            }
+            
+            currentAnimating = true;
+            const display = document.getElementById('textDisplay');
+            display.innerHTML = '';
+            
+            animateWord(word);
+        }
+
+        async function animateWord(word) {
+            const display = document.getElementById('textDisplay');
+            
+            for (let i = 0; i < word.length; i++) {
+                const letter = word[i];
+                if (letter === ' ') continue;
+                
+                // Create letter element
+                const letterEl = document.createElement('div');
+                letterEl.className = 'letter';
+                letterEl.textContent = letter;
+                display.appendChild(letterEl);
+                
+                // Animate this letter
+                await animateLetter(letterEl, letter, i);
+            }
+            
+            currentAnimating = false;
+        }
+
+        function animateLetter(element, targetLetter, index) {
+            return new Promise(resolve => {
+                // Show the letter
+                setTimeout(() => {
+                    element.classList.add('active');
+                }, 100);
+                
+                // Start cycling through languages after letter appears
+                setTimeout(() => {
+                    cycleThroughLanguages(element, targetLetter, () => {
+                        // After cycling, make it final
+                        element.classList.add('final');
+                        setTimeout(() => {
+                            resolve();
+                        }, 300);
+                    });
+                }, 300);
+            });
+        }
+
+        function cycleThroughLanguages(element, targetLetter, onComplete) {
+            const mappings = languageMappings[targetLetter] || [targetLetter];
+            let currentIndex = 0;
+            
+            const cycleInterval = setInterval(() => {
+                // Simply change the text content - no opacity or transform changes
+                element.textContent = mappings[currentIndex];
+                currentIndex++;
+                
+                if (currentIndex >= mappings.length) {
+                    clearInterval(cycleInterval);
+                    element.textContent = targetLetter; // Final English letter
+                    onComplete();
+                }
+            }, 120);
+        }
+
+        // Allow Enter key to start animation
+        document.getElementById('wordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startAnimation();
+            }
+        });
+
+        // Auto-focus input
+        window.addEventListener('load', () => {
+            document.getElementById('wordInput').focus();
+        });
+    </script>
+</body>
+</html>
