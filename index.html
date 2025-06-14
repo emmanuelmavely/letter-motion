@@ -161,6 +161,10 @@
             min-height: 200px;
             margin: 60px 0;
             position: relative;
+            background: #000000;
+            border-radius: 16px;
+            padding: 40px;
+            transition: background-color 0.3s ease;
         }
         
         .letter-container {
@@ -412,6 +416,27 @@
             transition: opacity 0.3s ease;
         }
         
+        .icon-button.long-press-hint {
+            position: relative;
+        }
+        
+        .icon-button.long-press-hint::after {
+            content: "Long-press for iOS save";
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #86868b;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .icon-button.long-press-hint:hover::after {
+            opacity: 1;
+        }
+        
         @keyframes pulse {
             0% { 
                 box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4);
@@ -557,54 +582,56 @@
         const canvas = document.getElementById('recordingCanvas');
         const ctx = canvas.getContext('2d');
 
+        // Detect iOS for enhanced save options
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        
+        // Add long-press hint for iOS users
+        if (isIOS) {
+            downloadButton.classList.add('long-press-hint');
+        }
+
         // Settings panel toggle
         settingsButton.addEventListener('click', function() {
             controlsPanel.classList.toggle('open');
             settingsButton.classList.toggle('active');
         });
 
-        // Background color change
+        // Background color change (only affects animation area)
         backgroundColorInput.addEventListener('change', function() {
             if (!greenScreenToggle.classList.contains('active')) {
-                document.body.style.backgroundColor = this.value;
+                const animationDisplay = document.getElementById('textDisplay');
+                animationDisplay.style.backgroundColor = this.value;
             }
         });
 
-        // Font color change
+        // Font color change (only affects animation letters)
         fontColorInput.addEventListener('change', function() {
             const color = this.value;
-            document.body.style.color = color;
             
-            // Update letter colors
+            // Only update letters in the animation area
             const letters = document.querySelectorAll('.letter');
             letters.forEach(letter => {
                 letter.style.color = color;
             });
-            
-            // Update other text elements
-            const title = document.querySelector('.title');
-            const labels = document.querySelectorAll('.control-label');
-            const controlsHeader = document.querySelector('.controls-header');
-            
-            if (title) title.style.color = color;
-            if (controlsHeader) controlsHeader.style.color = color;
-            labels.forEach(label => label.style.color = color);
         });
 
         // Green screen toggle
         greenScreenToggle.addEventListener('click', function() {
             greenScreenToggle.classList.toggle('active');
+            const animationDisplay = document.getElementById('textDisplay');
+            
             if (greenScreenToggle.classList.contains('active')) {
-                document.body.style.backgroundColor = greenScreenColorSelect.value;
+                animationDisplay.style.backgroundColor = greenScreenColorSelect.value;
             } else {
-                document.body.style.backgroundColor = backgroundColorInput.value;
+                animationDisplay.style.backgroundColor = backgroundColorInput.value;
             }
         });
 
         // Green screen color change
         greenScreenColorSelect.addEventListener('change', function() {
             if (greenScreenToggle.classList.contains('active')) {
-                document.body.style.backgroundColor = this.value;
+                const animationDisplay = document.getElementById('textDisplay');
+                animationDisplay.style.backgroundColor = this.value;
             }
         });
 
@@ -616,18 +643,87 @@
                 stopRecording();
             }
         });
+        
+        // Add debug info for troubleshooting
+        console.log('MediaRecorder supported:', typeof MediaRecorder !== 'undefined');
 
-        // Download button
-        downloadButton.addEventListener('click', function() {
+        // Download button with long-press support for iOS (including touch events)
+        let longPressTimer;
+        
+        // Mouse events
+        downloadButton.addEventListener('mousedown', startLongPress);
+        downloadButton.addEventListener('mouseup', endLongPress);
+        downloadButton.addEventListener('mouseleave', endLongPress);
+        
+        // Touch events for mobile
+        downloadButton.addEventListener('touchstart', startLongPress);
+        downloadButton.addEventListener('touchend', endLongPress);
+        downloadButton.addEventListener('touchcancel', endLongPress);
+        
+        function startLongPress(e) {
             if (recordedChunks.length === 0) return;
             
-            const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+            if (isIOS) {
+                longPressTimer = setTimeout(() => {
+                    // Long press detected - try enhanced save for iOS
+                    handleIOSSave();
+                    // Provide haptic feedback if available
+                    if (navigator.vibrate) {
+                        navigator.vibrate(50);
+                    }
+                }, 800); // 800ms for long press
+            }
+        }
+        
+        function endLongPress(e) {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        }
+        
+        downloadButton.addEventListener('click', function(e) {
+            console.log('Download clicked. Chunks:', recordedChunks.length);
+            
+            if (recordedChunks.length === 0) {
+                alert('No video recorded. Please record a video first.');
+                return;
+            }
+            
+            // Prevent click if it was a long press
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+                return;
+            }
+            
+            // Regular download
+            handleRegularDownload();
+        });
+        
+        function handleRegularDownload() {
+            if (recordedChunks.length === 0) {
+                alert('No video recorded. Please record a video first.');
+                return;
+            }
+            
+            // Create blob from chunks
+            const blob = new Blob(recordedChunks, { 
+                type: mediaRecorder ? mediaRecorder.mimeType : 'video/webm' 
+            });
+            
+            console.log('Creating download blob:', blob.type, 'Size:', blob.size);
+            
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             
             a.style.display = 'none';
             a.href = url;
-            a.download = 'letter-animation.mp4';
+            
+            // Use proper file extension
+            const fileExtension = getFileExtension(blob.type);
+            a.download = `letter-animation${fileExtension}`;
+            
             document.body.appendChild(a);
             a.click();
             
@@ -635,7 +731,93 @@
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
             }, 100);
-        });
+            
+            console.log('Download triggered for:', blob.type, 'Size:', blob.size);
+        }
+        
+        function handleIOSSave() {
+            if (recordedChunks.length === 0) {
+                alert('No video recorded. Please record a video first.');
+                return;
+            }
+            
+            // Create blob from chunks
+            const blob = new Blob(recordedChunks, { 
+                type: mediaRecorder ? mediaRecorder.mimeType : 'video/webm' 
+            });
+            
+            // Try Web Share API first (works better on iOS)
+            if (navigator.share && navigator.canShare) {
+                try {
+                    const file = new File([blob], 'letter-animation.webm', { 
+                        type: blob.type 
+                    });
+                    
+                    if (navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: 'Letter Motion Animation',
+                            text: 'Check out this letter animation!'
+                        }).then(() => {
+                            console.log('Share successful');
+                        }).catch((error) => {
+                            console.log('Share failed:', error);
+                            fallbackIOSSave(blob);
+                        });
+                        return;
+                    }
+                } catch (error) {
+                    console.log('Web Share API failed:', error);
+                }
+            }
+            
+            // Fallback to direct download approach
+            fallbackIOSSave(blob);
+        }
+        
+        function fallbackIOSSave(blob) {
+            // Create a temporary URL and trigger download
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'letter-animation.webm';
+            a.target = '_blank'; // Important for iOS
+            
+            document.body.appendChild(a);
+            
+            // For iOS, we need to trigger this differently
+            if (isIOS) {
+                // Create a click event that iOS recognizes
+                const clickEvent = new MouseEvent('click', {
+                    view: window,
+                    bubbles: true,
+                    cancelable: true
+                });
+                a.dispatchEvent(clickEvent);
+                
+                // Show instructions for iOS users
+                setTimeout(() => {
+                    alert('Tip for iOS: After downloading, the video will be in your Files app. You can then move it to Photos by opening Files > letter-animation.webm > Share > Save to Photos');
+                }, 1000);
+            } else {
+                a.click();
+            }
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 100);
+        }
+        
+        function getFileExtension(mimeType) {
+            if (!mimeType) return '.webm'; // Default fallback
+            if (mimeType.includes('mp4')) return '.mp4';
+            if (mimeType.includes('webm')) return '.webm';
+            if (mimeType.includes('mov')) return '.mov';
+            return '.webm'; // Default fallback
+        }
 
         function startAnimation() {
             if (currentAnimating) return;
@@ -778,60 +960,122 @@
             recordButton.classList.add('recording');
             downloadButton.disabled = true;
             
-            // Try different codecs for better MP4 support
-            let options = { mimeType: 'video/webm;codecs=vp9' };
-            if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) {
-                options = { mimeType: 'video/webm;codecs=h264' };
-            } else if (MediaRecorder.isTypeSupported('video/mp4;codecs=h264')) {
-                options = { mimeType: 'video/mp4;codecs=h264' };
-            }
+            console.log('Starting recording...');
             
-            const stream = canvas.captureStream(30);
-            mediaRecorder = new MediaRecorder(stream, options);
-            
-            mediaRecorder.ondataavailable = function(e) {
-                if (e.data.size > 0) {
-                    recordedChunks.push(e.data);
+            try {
+                // Get canvas stream
+                const stream = canvas.captureStream(30);
+                console.log('Canvas stream created:', stream);
+                
+                // Try different codecs
+                let options = { mimeType: 'video/webm;codecs=vp9' };
+                if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
+                    options = { mimeType: 'video/webm;codecs=vp8' };
+                } else if (MediaRecorder.isTypeSupported('video/webm')) {
+                    options = { mimeType: 'video/webm' };
                 }
-            };
-            
-            mediaRecorder.onstop = function() {
-                downloadButton.disabled = false;
-            };
-            
-            mediaRecorder.start();
-            startTime = performance.now();
-            animationLoop();
-            
-            if (!currentAnimating) {
-                const word = document.getElementById('wordInput').value;
-                if (word) {
-                    animateWord(word);
-                } else {
-                    let bgColor = backgroundColorInput.value;
-                    if (greenScreenToggle.classList.contains('active')) {
-                        bgColor = greenScreenColorSelect.value;
+                
+                console.log('Using options:', options);
+                
+                mediaRecorder = new MediaRecorder(stream, options);
+                
+                mediaRecorder.ondataavailable = function(event) {
+                    console.log('Data available:', event.data.size);
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
                     }
-                    
-                    ctx.fillStyle = bgColor;
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.font = '48px Inter';
-                    ctx.fillStyle = fontColorInput.value;
-                    ctx.textAlign = 'center';
-                    ctx.fillText('Please enter a word and try again', canvas.width/2, canvas.height/2);
-                    
-                    setTimeout(stopRecording, 2000);
+                };
+                
+                mediaRecorder.onstop = function() {
+                    console.log('Recording stopped, chunks:', recordedChunks.length);
+                    if (recordedChunks.length > 0) {
+                        downloadButton.disabled = false;
+                    }
+                    isRecording = false;
+                    recordButton.classList.remove('recording');
+                };
+                
+                mediaRecorder.onerror = function(event) {
+                    console.error('MediaRecorder error:', event);
+                    resetRecordingState();
+                };
+                
+                mediaRecorder.start(1000); // Collect data every second
+                console.log('MediaRecorder started');
+                
+                startTime = performance.now();
+                animationLoop();
+                
+                // Start animation if word exists
+                if (!currentAnimating) {
+                    const word = document.getElementById('wordInput').value;
+                    if (word.trim()) {
+                        animateWord(word);
+                    } else {
+                        drawMessageOnCanvas('Please enter a word and try again');
+                        setTimeout(stopRecording, 2000);
+                    }
                 }
+                
+            } catch (error) {
+                console.error('Recording failed:', error);
+                resetRecordingState();
+                alert('Recording failed: ' + error.message);
             }
         }
         
         function stopRecording() {
+            console.log('Stopping recording...');
+            
             if (mediaRecorder && mediaRecorder.state !== 'inactive') {
                 mediaRecorder.stop();
-                isRecording = false;
-                recordButton.classList.remove('recording');
-                cancelAnimationFrame(animationFrameId);
+                
+                // Stop all tracks
+                if (mediaRecorder.stream) {
+                    mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                }
             }
+            
+            cancelAnimationFrame(animationFrameId);
+        }
+        
+        function resetRecordingState() {
+            isRecording = false;
+            recordButton.classList.remove('recording');
+            downloadButton.disabled = true;
+            console.log('Recording state reset');
+        }
+        
+        function drawMessageOnCanvas(message) {
+            let bgColor = backgroundColorInput.value;
+            if (greenScreenToggle.classList.contains('active')) {
+                bgColor = greenScreenColorSelect.value;
+            }
+            
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '48px Inter';
+            ctx.fillStyle = fontColorInput.value;
+            ctx.textAlign = 'center';
+            ctx.fillText(message, canvas.width/2, canvas.height/2);
+        }
+        
+        function getOptimalMimeType() {
+            // Simplified priority list
+            const types = [
+                'video/mp4',
+                'video/webm;codecs=h264',
+                'video/webm;codecs=vp9',
+                'video/webm'
+            ];
+            
+            for (let type of types) {
+                if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(type)) {
+                    return type;
+                }
+            }
+            
+            return 'video/webm'; // Final fallback
         }
         
         function animationLoop() {
@@ -897,6 +1141,16 @@
                 settingsButton.classList.remove('active');
             }
         });
+
+        const textInput = document.querySelector('#textBox');
+        const animationContainer = document.querySelector('.letter-container');
+
+        // Update animation text
+        const text = textInput.value; // Use raw input
+        animationContainer.textContent = text;
+
+        // Use the same text for recording
+        const recordingText = text; // No transformation
     </script>
 </body>
 </html>
