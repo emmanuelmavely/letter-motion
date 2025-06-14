@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multilingual Text Animator</title>
-    <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
+    <title>Letter Motion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,112 +13,181 @@
         }
         
         body {
-            background: #000;
-            font-family: 'Poppins', sans-serif;
-            overflow: hidden;
+            background: #000000;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            color: #ffffff;
+            transition: background-color 0.3s ease;
         }
         
-        .video-frame {
-            width: 100vw;
+        .main-container {
+            width: 100%;
             height: 100vh;
-            background: #000;
-            position: relative;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            position: relative;
+            padding: 40px 20px;
         }
         
-        .input-container {
+        .header {
             position: absolute;
-            top: 50px;
+            top: 60px;
             left: 50%;
             transform: translateX(-50%);
+            text-align: center;
             z-index: 100;
         }
         
-        .input-container input {
+        .title {
+            font-size: 32px;
+            font-weight: 200;
+            color: #ffffff;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
+        .subtitle {
+            font-size: 17px;
+            font-weight: 300;
+            color: #86868b;
+            margin-bottom: 40px;
+        }
+        
+        .input-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .input-field {
             background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 15px 20px;
-            font-size: 18px;
-            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 16px 20px;
+            font-size: 17px;
+            font-weight: 400;
+            border-radius: 12px;
             outline: none;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+            width: 280px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         }
         
-        .input-container input:focus {
-            border-color: rgba(255, 255, 255, 0.6);
-            background: rgba(255, 255, 255, 0.15);
+        .input-field:focus {
+            border-color: rgba(0, 122, 255, 0.6);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1), 0 4px 16px rgba(0, 0, 0, 0.4);
         }
         
-        .input-container button {
-            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+        .input-field::placeholder {
+            color: #86868b;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .animate-button {
+            background: #007aff;
             border: none;
             color: white;
-            padding: 15px 25px;
-            font-size: 18px;
-            border-radius: 10px;
-            margin-left: 10px;
+            padding: 16px 24px;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+            white-space: nowrap;
         }
         
-        .input-container button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+        .animate-button:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
         }
         
-        .text-display {
+        .animate-button:active {
+            transform: translateY(0);
+        }
+        
+        .icon-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+        }
+        
+        .icon-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+        
+        .icon-button.active {
+            background: #007aff;
+            border-color: #007aff;
+        }
+        
+        .icon-button.recording {
+            background: #ff3b30;
+            border-color: #ff3b30;
+            animation: pulse 2s infinite;
+        }
+        
+        .animation-display {
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 200px;
+            margin: 60px 0;
             position: relative;
-            gap: 15px; /* Default gap that will be overridden by JavaScript */
-            margin: 40px 0;
-            min-height: 150px; /* Add min-height to ensure consistent vertical space */
         }
         
         .letter-container {
-            font-family: 'Poppins', sans-serif;
             display: flex;
-            gap: 0.2em;
+            gap: 0.3em;
         }
 
         .letter {
             font-size: 120px;
-            font-weight: bold;
-            color: white;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
-            
-            /* --- THIS IS THE CRITICAL PART --- */
-            /* Adjust this value. It needs to be wide enough for your WIDEST character */
-            /* from languageMappings at 120px Poppins bold. */
-            /* Examples: 'W', 'M', '艾', '比', '勒', '马', '娜', '哦', '帕', '瑞', '萨', '特', '优', '维', '瓦', '希', '泽' */
-            /* Try values like 130px, 140px, 150px, or even more. */
-            min-width: 140px; /* START HERE AND INCREASE IF NEEDED */
-            
-            text-align: center; /* Centers narrower characters within the fixed min-width */
-            white-space: nowrap; /* Ensures single characters don't wrap (less relevant for single chars but good practice) */
-            
-            display: inline-block; /* Crucial for min-width and text-align to work as expected */
-            vertical-align: middle; /* Helps with consistent vertical alignment */
-
-            opacity: 0; /* Initial state for popIn animation */
-            transform: scale(0.95); /* Initial state for popIn animation */
-            
-            animation: popIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            will-change: opacity, transform; /* Good for performance */
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            min-width: 140px;
+            text-align: center;
+            white-space: nowrap;
+            display: inline-block;
+            vertical-align: middle;
+            opacity: 0;
+            transform: scale(0.8) translateY(20px);
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            will-change: opacity, transform;
         }
 
-        @keyframes popIn {
+        @keyframes fadeInUp {
           to {
             opacity: 1;
-            transform: scale(1);
+            transform: scale(1) translateY(0);
           }
         }
 
@@ -127,163 +196,313 @@
         }
         
         .letter.final {
-            color: white;
-            text-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+            color: #ffffff;
+            text-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
         }
         
-        .letter.move-right {
-            transform: translateX(100px);
-        }
-        
-        .letter.move-out {
-            transform: translateX(80px) scale(0.95);
-            opacity: 0;
-        }
-        
-        .letter.move-in {
-            transform: translateX(0) scale(1);
-            opacity: 1;
-        }
-        
-        .instructions {
-            position: absolute;
-            bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.6);
-            text-align: center;
-            font-size: 16px;
-        }
-
         .controls-panel {
             position: fixed;
-            bottom: 20px; /* Changed from top to bottom */
-            left: 20px;   /* Changed from top to bottom */
-            background: rgba(20, 20, 30, 0.85); /* Darker, slightly transparent */
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #e0e0e0; /* Lighter text color */
-            font-family: 'Poppins', sans-serif;
-            font-size: 13px; /* Slightly smaller font */
-            z-index: 1000; /* Ensure it's on top */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            top: 20px;
+            right: 20px;
+            background: rgba(28, 28, 30, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            width: 280px;
+            transform: translateX(320px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .controls-panel.open {
+            transform: translateX(0);
         }
 
-        .controls-panel div {
-            margin-bottom: 10px;
-            display: flex; /* For better alignment */
-            align-items: center; /* Vertically align items */
-        }
-        .controls-panel div:last-child {
-            margin-bottom: 0;
-        }
-
-        .controls-panel label {
-            margin-right: 10px;
-            display: inline-block;
-            width: 160px; /* Adjusted width */
-            font-weight: 400; /* Normal weight */
+        .controls-header {
+            font-size: 17px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
-        .controls-panel input[type="number"] {
-            width: 70px; /* Adjusted width */
-            padding: 6px 8px; /* More padding */
-            border-radius: 4px;
-            border: 1px solid #555;
-            background: #2a2a3a; /* Darker input background */
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            font-size: 13px;
-        }
-        .controls-panel input[type="number"]:focus {
-            outline: none;
-            border-color: #777;
-            box-shadow: 0 0 5px rgba(100,100,255,0.3);
-        }
-
-        .video-controls {
+        .control-group {
+            margin-bottom: 16px;
             display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 10px;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-group:last-of-type {
+            margin-bottom: 20px;
         }
 
-        .control-button {
-            background: #3d3d50;
-            color: white;
+        .control-label {
+            font-weight: 500;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .control-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 14px;
+            font-weight: 400;
+            color: #ffffff;
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .control-input:focus {
+            border-color: rgba(0, 122, 255, 0.6);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+        
+        .control-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 14px;
+            font-weight: 400;
+            color: #ffffff;
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+        }
+        
+        .control-select:focus {
+            border-color: rgba(0, 122, 255, 0.6);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+        
+        .control-input[type="color"] {
+            height: 40px;
+            padding: 4px;
+            cursor: pointer;
+        }
+        
+        .control-input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
             border: none;
             border-radius: 4px;
-            padding: 8px 16px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 13px;
+        }
+        
+        .control-input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 4px;
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background 0.2s ease;
+        }
+        
+        .toggle.active {
+            background: #00FF00;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+        
+        .toggle.active .toggle-slider {
+            transform: translateX(20px);
         }
 
-        .control-button:hover {
-            background: #4d4d66;
+        .footer {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #86868b;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 400;
+            max-width: 600px;
+            line-height: 1.4;
+        }
+        
+        .footer a {
+            color: #007aff;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .footer a:hover {
+            color: #0056b3;
         }
 
-        .control-button:disabled {
-            background: #2a2a3a;
-            color: #666;
-            cursor: not-allowed;
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .controls-panel {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+                top: auto;
+                width: auto;
+                transform: translateY(100%);
+            }
+            
+            .controls-panel.open {
+                transform: translateY(0);
+            }
+            
+            .input-section {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .input-field {
+                width: 100%;
+                max-width: 320px;
+            }
+            
+            .letter {
+                font-size: 80px;
+                min-width: 100px;
+            }
+            
+            .title {
+                font-size: 28px;
+            }
+            
+            .header {
+                top: 40px;
+            }
+            
+            .button-group {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
         }
 
-        .control-button.recording {
-            background: #d64045;
-            animation: pulse 1.5s infinite;
+        /* Hide elements during animation for cleaner look */
+        .animating .controls-panel {
+            opacity: 0.3;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
-
+        
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(214, 64, 69, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(214, 64, 69, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(214, 64, 69, 0); }
-        }
-
-        .note {
-            font-size: 12px;
-            color: #aaa;
-            margin-top: 10px;
+            0% { 
+                box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 0 8px rgba(255, 59, 48, 0);
+                transform: scale(1.02);
+            }
+            100% { 
+                box-shadow: 0 0 0 0 rgba(255, 59, 48, 0);
+                transform: scale(1);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="video-frame">
-        <div class="input-container">
-            <input type="text" id="wordInput" placeholder="Enter a word (e.g., AKHIL)" maxlength="15">
-            <button onclick="startAnimation()">Animate</button>
+    <div class="main-container">
+        <div class="header">
+            <h1 class="title">Letter Motion</h1>
+            <p class="subtitle">Watch letters transform through languages</p>
+            
+            <div class="input-section">
+                <input type="text" id="wordInput" class="input-field" placeholder="Enter text" maxlength="15">
+                <div class="button-group">
+                    <button onclick="startAnimation()" class="animate-button">Animate</button>
+                    <button id="settingsButton" class="icon-button" title="Settings">⚙️</button>
+                    <button id="recordButton" class="icon-button" title="Record">🎥</button>
+                    <button id="downloadButton" class="icon-button" title="Download" disabled>📥</button>
+                </div>
+            </div>
         </div>
         
-        <div class="text-display" id="textDisplay">
+        <div class="animation-display" id="textDisplay">
         </div>
         
-        <div class="instructions">
-            Enter a word above and click "Animate" to see each letter cycle through different languages
-            <p class="note">Note: Video recording works best in Chrome/Edge. Large animations may result in large file sizes.</p>
+        <div class="footer">
+            Each letter cycles through different writing systems before revealing the final character.
+            <br><a href="https://github.com/emmanuelmavely/letter-motion" target="_blank">View on GitHub</a>
         </div>
     </div>
 
     <!-- Hidden canvas for video recording -->
     <canvas id="recordingCanvas" width="1920" height="1080" style="display:none;"></canvas>
 
-    <div class="controls-panel">
-        <div>
-            <label for="numCyclesInput">Cycles per Letter (5-50):</label>
-            <input type="number" id="numCyclesInput" value="12" min="5" max="50">
+    <div class="controls-panel" id="controlsPanel">
+        <div class="controls-header">Settings</div>
+        
+        <div class="control-group">
+            <label class="control-label">Animation Cycles</label>
+            <input type="number" id="numCyclesInput" class="control-input" value="12" min="5" max="50">
         </div>
-        <div>
-            <label for="cycleIntervalInput">Cycle Speed (ms, 20-200):</label>
-            <input type="number" id="cycleIntervalInput" value="75" min="20" max="200" step="5">
+        
+        <div class="control-group">
+            <label class="control-label">Speed (ms)</label>
+            <input type="number" id="cycleIntervalInput" class="control-input" value="75" min="20" max="200" step="5">
         </div>
-        <div>
-            <label for="letterSpacingInput">Letter Spacing (px, 0-50):</label>
-            <input type="number" id="letterSpacingInput" value="15" min="0" max="50" step="1">
+        
+        <div class="control-group">
+            <label class="control-label">Letter Spacing</label>
+            <input type="number" id="letterSpacingInput" class="control-input" value="15" min="0" max="50" step="1">
         </div>
-        <div class="video-controls">
-            <button id="recordButton" class="control-button">Record Animation</button>
-            <button id="downloadButton" class="control-button" disabled>Download 1080p Video</button>
+        
+        <div class="control-group">
+            <div class="toggle-container">
+                <label class="control-label">Green Screen</label>
+                <div class="toggle" id="greenScreenToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label">Background Color</label>
+            <input type="color" id="backgroundColorInput" class="control-input" value="#000000">
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label">Font Color</label>
+            <input type="color" id="fontColorInput" class="control-input" value="#ffffff">
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label">Green Screen Color</label>
+            <select id="greenScreenColorSelect" class="control-select">
+                <option value="#00FF00">Chroma Green (#00FF00)</option>
+                <option value="#00B04F">Studio Green (#00B04F)</option>
+                <option value="#0000FF">Blue Screen (#0000FF)</option>
+                <option value="#FF00FF">Magenta (#FF00FF)</option>
+                <option value="#FFFF00">Yellow (#FFFF00)</option>
+            </select>
         </div>
     </div>
 
@@ -294,7 +513,7 @@
             'A': ['अ', 'আ', 'அ', 'అ', 'ಅ', 'അ', 'અ', 'ਏ', 'ا', 'あ', 'ㅏ', '艾', 'Ā'],
             'B': ['ब', 'ব', 'প', 'బ', 'ಬ', 'ബ', 'બ', 'ਬ', 'ب', 'び', 'ㅂ', '比', '฿'],
             'C': ['च', 'চ', 'ச', 'చ', 'ಚ', 'ച', 'સ', 'ਸ', 'س', 'Ц', 'し', 'ㅊ', '西', 'Č'],
-            'D': ['द', 'দ', 'ட', 'ద', 'ದ', 'ദ', 'ડ', 'ਡ', 'د', 'Д', 'Δ', 'で', 'ㄷ', '迪', 'Ď'],
+            'D': ['द', 'দ', 'ট', 'ద', 'ದ', 'ദ', 'ડ', 'ਡ', 'د', 'Д', 'Δ', 'で', 'ㄷ', '迪', 'Ď'],
             'E': ['ए', 'এ', 'எ', 'ఎ', 'ಎ', 'എ', 'ઈ', 'ਈ', 'إ', 'え', 'ㅔ', '伊', 'Ē'],
             'F': ['फ', 'ফ', 'ಫ', 'ఫ', 'ಫ', 'ഫ', 'ફ', 'ફ', 'ف', 'Ф', 'Φ', 'ふ', 'ㅍ', '弗', 'Ƒ'],
             'G': ['ग', 'গ', 'க', 'గ', 'ಗ', 'ഗ', 'ગ', 'જ', 'ج', 'じ', 'ㄱ', '吉', 'Ĝ'],
@@ -320,6 +539,103 @@
         };
 
         let currentAnimating = false;
+        let isRecording = false;
+        let mediaRecorder;
+        let recordedChunks = [];
+        let animationFrameId;
+        let startTime;
+
+        // UI Elements
+        const settingsButton = document.getElementById('settingsButton');
+        const controlsPanel = document.getElementById('controlsPanel');
+        const recordButton = document.getElementById('recordButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const greenScreenToggle = document.getElementById('greenScreenToggle');
+        const backgroundColorInput = document.getElementById('backgroundColorInput');
+        const fontColorInput = document.getElementById('fontColorInput');
+        const greenScreenColorSelect = document.getElementById('greenScreenColorSelect');
+        const canvas = document.getElementById('recordingCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Settings panel toggle
+        settingsButton.addEventListener('click', function() {
+            controlsPanel.classList.toggle('open');
+            settingsButton.classList.toggle('active');
+        });
+
+        // Background color change
+        backgroundColorInput.addEventListener('change', function() {
+            if (!greenScreenToggle.classList.contains('active')) {
+                document.body.style.backgroundColor = this.value;
+            }
+        });
+
+        // Font color change
+        fontColorInput.addEventListener('change', function() {
+            const color = this.value;
+            document.body.style.color = color;
+            
+            // Update letter colors
+            const letters = document.querySelectorAll('.letter');
+            letters.forEach(letter => {
+                letter.style.color = color;
+            });
+            
+            // Update other text elements
+            const title = document.querySelector('.title');
+            const labels = document.querySelectorAll('.control-label');
+            const controlsHeader = document.querySelector('.controls-header');
+            
+            if (title) title.style.color = color;
+            if (controlsHeader) controlsHeader.style.color = color;
+            labels.forEach(label => label.style.color = color);
+        });
+
+        // Green screen toggle
+        greenScreenToggle.addEventListener('click', function() {
+            greenScreenToggle.classList.toggle('active');
+            if (greenScreenToggle.classList.contains('active')) {
+                document.body.style.backgroundColor = greenScreenColorSelect.value;
+            } else {
+                document.body.style.backgroundColor = backgroundColorInput.value;
+            }
+        });
+
+        // Green screen color change
+        greenScreenColorSelect.addEventListener('change', function() {
+            if (greenScreenToggle.classList.contains('active')) {
+                document.body.style.backgroundColor = this.value;
+            }
+        });
+
+        // Record button
+        recordButton.addEventListener('click', function() {
+            if (!isRecording) {
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        });
+
+        // Download button
+        downloadButton.addEventListener('click', function() {
+            if (recordedChunks.length === 0) return;
+            
+            const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'letter-animation.mp4';
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 100);
+        });
 
         function startAnimation() {
             if (currentAnimating) return;
@@ -328,11 +644,12 @@
             const word = input.value.toUpperCase().trim();
             
             if (!word) {
-                alert('Please enter a word');
+                input.focus();
                 return;
             }
             
             currentAnimating = true;
+            document.body.classList.add('animating');
             const display = document.getElementById('textDisplay');
             display.innerHTML = '';
             
@@ -374,19 +691,16 @@
                 await animateLetter(letterSpans[i], letters[i], i);
             }
             currentAnimating = false;
+            document.body.classList.remove('animating');
         }
 
         async function animateLetter(element, targetLetter, index) {
-            // The element is already in the DOM.
-            // The CSS 'popIn' animation handles its initial appearance.
             return new Promise(resolve => {
                 cycleThroughLanguages(element, targetLetter, () => {
-                    // This is the onComplete callback from cycleThroughLanguages
                     element.textContent = targetLetter;
-                    // Ensure final styling, though popIn's "forwards" should handle opacity/scale.
                     element.style.opacity = '1';
-                    element.style.transform = 'scale(1)';
-                    resolve(); // Resolve the promise for this letter's animation
+                    element.style.transform = 'scale(1) translateY(0)';
+                    resolve();
                 });
             });
         }
@@ -394,24 +708,20 @@
         function cycleThroughLanguages(element, targetLetter, onComplete) {
             let cycles = 0;
 
-            // Read values from the control panel
             const numCyclesInput = document.getElementById('numCyclesInput');
             const cycleIntervalInput = document.getElementById('cycleIntervalInput');
 
-            // Use parseInt to ensure they are numbers, provide defaults if parsing fails or input is invalid
             let maxCycles = parseInt(numCyclesInput.value, 10);
             if (isNaN(maxCycles) || maxCycles < parseInt(numCyclesInput.min, 10) || maxCycles > parseInt(numCyclesInput.max, 10)) {
-                maxCycles = 12; // Default value if input is invalid
-                numCyclesInput.value = maxCycles; // Correct the input field
+                maxCycles = 12;
+                numCyclesInput.value = maxCycles;
             }
 
             let intervalTime = parseInt(cycleIntervalInput.value, 10);
             if (isNaN(intervalTime) || intervalTime < parseInt(cycleIntervalInput.min, 10) || intervalTime > parseInt(cycleIntervalInput.max, 10)) {
-                intervalTime = 75; // Default value
-                cycleIntervalInput.value = intervalTime; // Correct the input field
+                intervalTime = 75;
+                cycleIntervalInput.value = intervalTime;
             }
-            // Add a small random factor to maxCycles if you still want some variability
-            // maxCycles += Math.floor(Math.random() * 3) -1; // e.g., +/- 1 cycle randomly
 
             const upperTargetLetter = targetLetter.toUpperCase();
             let mappedChars = languageMappings[upperTargetLetter];
@@ -423,7 +733,7 @@
                     cyclingCharsPool = mappedChars;
                 }
             } else {
-                const fallbackSymbols = ['*', '#', '$', '%', '§', 'Ω', '∑', '∆', '!', '?'];
+                const fallbackSymbols = ['*', '#', '$', '%', '§', 'Ω', '∑', '∆', '!', '?'];
                 cyclingCharsPool = fallbackSymbols.filter(s => s !== targetLetter);
                 if (cyclingCharsPool.length === 0) cyclingCharsPool = ['?'];
             }
@@ -462,6 +772,112 @@
             }, intervalTime);
         }
 
+        function startRecording() {
+            recordedChunks = [];
+            isRecording = true;
+            recordButton.classList.add('recording');
+            downloadButton.disabled = true;
+            
+            // Try different codecs for better MP4 support
+            let options = { mimeType: 'video/webm;codecs=vp9' };
+            if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) {
+                options = { mimeType: 'video/webm;codecs=h264' };
+            } else if (MediaRecorder.isTypeSupported('video/mp4;codecs=h264')) {
+                options = { mimeType: 'video/mp4;codecs=h264' };
+            }
+            
+            const stream = canvas.captureStream(30);
+            mediaRecorder = new MediaRecorder(stream, options);
+            
+            mediaRecorder.ondataavailable = function(e) {
+                if (e.data.size > 0) {
+                    recordedChunks.push(e.data);
+                }
+            };
+            
+            mediaRecorder.onstop = function() {
+                downloadButton.disabled = false;
+            };
+            
+            mediaRecorder.start();
+            startTime = performance.now();
+            animationLoop();
+            
+            if (!currentAnimating) {
+                const word = document.getElementById('wordInput').value;
+                if (word) {
+                    animateWord(word);
+                } else {
+                    let bgColor = backgroundColorInput.value;
+                    if (greenScreenToggle.classList.contains('active')) {
+                        bgColor = greenScreenColorSelect.value;
+                    }
+                    
+                    ctx.fillStyle = bgColor;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.font = '48px Inter';
+                    ctx.fillStyle = fontColorInput.value;
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Please enter a word and try again', canvas.width/2, canvas.height/2);
+                    
+                    setTimeout(stopRecording, 2000);
+                }
+            }
+        }
+        
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                isRecording = false;
+                recordButton.classList.remove('recording');
+                cancelAnimationFrame(animationFrameId);
+            }
+        }
+        
+        function animationLoop() {
+            // Get current background color
+            let bgColor = backgroundColorInput.value;
+            if (greenScreenToggle.classList.contains('active')) {
+                bgColor = greenScreenColorSelect.value;
+            }
+            
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const textDisplay = document.getElementById('textDisplay');
+            
+            ctx.save();
+            ctx.translate(
+                canvas.width / 2 - textDisplay.offsetWidth / 2, 
+                canvas.height / 2 - textDisplay.offsetHeight / 2
+            );
+            
+            const letters = textDisplay.querySelectorAll('.letter');
+            letters.forEach((letter, index) => {
+                const style = window.getComputedStyle(letter);
+                const letterSpacing = parseInt(document.getElementById('letterSpacingInput').value) || 15;
+                
+                ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+                ctx.fillStyle = fontColorInput.value;
+                ctx.textAlign = 'center';
+                
+                const x = index * (parseInt(style.minWidth) + letterSpacing);
+                
+                ctx.globalAlpha = parseFloat(style.opacity);
+                ctx.fillText(letter.textContent || ' ', x + parseInt(style.minWidth)/2, parseInt(style.fontSize)/2);
+            });
+            
+            ctx.restore();
+            
+            if (isRecording) {
+                if (performance.now() - startTime > 10000) {
+                    stopRecording();
+                    return;
+                }
+                animationFrameId = requestAnimationFrame(animationLoop);
+            }
+        }
+
         // Allow Enter key to start animation
         document.getElementById('wordInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -474,166 +890,13 @@
             document.getElementById('wordInput').focus();
         });
 
-        // Video recording variables
-        let mediaRecorder;
-        let recordedChunks = [];
-        let isRecording = false;
-        let animationFrameId;
-        let startTime;
-        
-        // Initialize recording functionality
-        const recordButton = document.getElementById('recordButton');
-        const downloadButton = document.getElementById('downloadButton');
-        const canvas = document.getElementById('recordingCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Function to start/stop recording
-        recordButton.addEventListener('click', function() {
-            if (!isRecording) {
-                // Start recording
-                startRecording();
-            } else {
-                // Stop recording
-                stopRecording();
+        // Close settings panel when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!controlsPanel.contains(e.target) && !settingsButton.contains(e.target)) {
+                controlsPanel.classList.remove('open');
+                settingsButton.classList.remove('active');
             }
         });
-        
-        // Function to download the recorded video
-        downloadButton.addEventListener('click', function() {
-            if (recordedChunks.length === 0) return;
-            
-            const blob = new Blob(recordedChunks, { type: 'video/webm' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            
-            a.style.display = 'none';
-            a.href = url;
-            a.download = 'letter-animation-1080p.webm';
-            document.body.appendChild(a);
-            a.click();
-            
-            setTimeout(() => {
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            }, 100);
-        });
-        
-        function startRecording() {
-            recordedChunks = [];
-            isRecording = true;
-            recordButton.textContent = "Stop Recording";
-            recordButton.classList.add('recording');
-            downloadButton.disabled = true;
-            
-            // Set up the stream from the canvas
-            const stream = canvas.captureStream(30); // 30 FPS
-            mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
-            
-            mediaRecorder.ondataavailable = function(e) {
-                if (e.data.size > 0) {
-                    recordedChunks.push(e.data);
-                }
-            };
-            
-            mediaRecorder.onstop = function() {
-                downloadButton.disabled = false;
-            };
-            
-            // Start the recorder and the animation loop
-            mediaRecorder.start();
-            startTime = performance.now();
-            animationLoop();
-            
-            // Trigger animation if not already animating
-            if (!currentAnimating) {
-                const word = document.getElementById('wordInput').value;
-                if (word) {
-                    animateWord(word);
-                } else {
-                    // If no word is entered, show a message on the canvas
-                    ctx.fillStyle = 'black';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.font = '48px Poppins';
-                    ctx.fillStyle = 'white';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('Please enter a word and try again', canvas.width/2, canvas.height/2);
-                    
-                    // Auto-stop recording if no animation
-                    setTimeout(stopRecording, 2000);
-                }
-            }
-        }
-        
-        function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                isRecording = false;
-                recordButton.textContent = "Record Animation";
-                recordButton.classList.remove('recording');
-                cancelAnimationFrame(animationFrameId);
-            }
-        }
-        
-        function animationLoop() {
-            // Clear canvas
-            ctx.fillStyle = 'black';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw the current state of the animation
-            const videoFrame = document.querySelector('.video-frame');
-            const textDisplay = document.getElementById('textDisplay');
-            
-            // Center the text on the canvas
-            ctx.save();
-            ctx.translate(
-                canvas.width / 2 - textDisplay.offsetWidth / 2, 
-                canvas.height / 2 - textDisplay.offsetHeight / 2
-            );
-            
-            // Draw each letter
-            const letters = textDisplay.querySelectorAll('.letter');
-            letters.forEach((letter, index) => {
-                // Get computed style of the letter
-                const style = window.getComputedStyle(letter);
-                const letterSpacing = parseInt(document.getElementById('letterSpacingInput').value) || 15;
-                
-                ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-                ctx.fillStyle = style.color;
-                ctx.textAlign = 'center';
-                
-                // Calculate position considering letter spacing
-                const x = index * (parseInt(style.minWidth) + letterSpacing);
-                
-                // Draw with the letter's current content
-                ctx.globalAlpha = parseFloat(style.opacity);
-                ctx.fillText(letter.textContent || ' ', x + parseInt(style.minWidth)/2, parseInt(style.fontSize)/2);
-            });
-            
-            ctx.restore();
-            
-            // Continue the loop only if still recording
-            if (isRecording) {
-                // Stop after 10 seconds to prevent huge files
-                if (performance.now() - startTime > 10000) {
-                    stopRecording();
-                    return;
-                }
-                animationFrameId = requestAnimationFrame(animationLoop);
-            }
-        }
-        
-        // Enhanced startAnimation function that can be used by the recorder
-        const originalStartAnimation = startAnimation;
-        startAnimation = function() {
-            const wordInput = document.getElementById('wordInput');
-            const word = wordInput.value.trim();
-            if (word && !currentAnimating) {
-                animateWord(word);
-            }
-        };
-        
-        // ... rest of your existing script ...
     </script>
-    <script src="script.js"></script>
 </body>
 </html>
