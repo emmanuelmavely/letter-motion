@@ -1,0 +1,515 @@
+/* Letter Motion - CSS Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #000000;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: #ffffff;
+    transition: background-color 0.3s ease;
+}
+
+.main-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 40px 20px;
+}
+
+.header {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 100;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 200;
+    color: #ffffff;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.subtitle {
+    font-size: 17px;
+    font-weight: 300;
+    color: #86868b;
+    margin-bottom: 40px;
+}
+
+.input-section {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.input-field {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 16px 20px;
+    font-size: 17px;
+    font-weight: 400;
+    border-radius: 12px;
+    outline: none;
+    width: 280px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.input-field:focus {
+    border-color: rgba(0, 122, 255, 0.6);
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1), 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.input-field::placeholder {
+    color: #86868b;
+}
+
+.button-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.animate-button {
+    background: #007aff;
+    border: none;
+    color: white;
+    padding: 16px 24px;
+    font-size: 17px;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+    white-space: nowrap;
+}
+
+.animate-button:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
+}
+
+.animate-button:active {
+    transform: translateY(0);
+}
+
+.icon-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+}
+
+.icon-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.icon-button.active {
+    background: #007aff;
+    border-color: #007aff;
+}
+
+.icon-button.recording {
+    background: #ff3b30;
+    border-color: #ff3b30;
+    animation: pulse 2s infinite;
+}
+
+.animation-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    margin: 60px 0;
+    position: relative;
+    background: #000000;
+    border-radius: 16px;
+    padding: 40px;
+    transition: background-color 0.3s ease;
+}
+
+.letter-container {
+    display: flex;
+    gap: 0.3em;
+}
+
+.letter {
+    font-size: 120px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    min-width: 140px;
+    text-align: center;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    will-change: opacity, transform;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.letter.active {
+    opacity: 1;
+}
+
+.letter.final {
+    color: #ffffff;
+    text-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+.controls-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(28, 28, 30, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    width: 280px;
+    transform: translateX(320px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.controls-panel.open {
+    transform: translateX(0);
+}
+
+.controls-header {
+    font-size: 17px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.control-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.control-group:last-of-type {
+    margin-bottom: 20px;
+}
+
+.control-label {
+    font-weight: 500;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.control-input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #ffffff;
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.control-input:focus {
+    border-color: rgba(0, 122, 255, 0.6);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.control-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #ffffff;
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+}
+
+.control-select:focus {
+    border-color: rgba(0, 122, 255, 0.6);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.control-input[type="color"] {
+    height: 40px;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.control-input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+}
+
+.control-input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.toggle {
+    position: relative;
+    width: 50px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.toggle.active {
+    background: #00FF00;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 26px;
+    height: 26px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+}
+
+.toggle.active .toggle-slider {
+    transform: translateX(20px);
+}
+
+.footer {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #86868b;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 400;
+    max-width: 600px;
+    line-height: 1.4;
+}
+
+.footer a {
+    color: #007aff;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer a:hover {
+    color: #0056b3;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .controls-panel {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        left: 20px;
+        top: auto;
+        width: auto;
+        transform: translateY(100%);
+    }
+    
+    .controls-panel.open {
+        transform: translateY(0);
+    }
+    
+    .input-section {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .input-field {
+        width: 100%;
+        max-width: 320px;
+    }
+    
+    .letter {
+        font-size: 80px;
+        min-width: 100px;
+    }
+    
+    .title {
+        font-size: 28px;
+    }
+    
+    .header {
+        top: 40px;
+    }
+    
+    .button-group {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* Hide elements during animation for cleaner look */
+.animating .controls-panel {
+    opacity: 0.3;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.icon-button.long-press-hint {
+    position: relative;
+}
+
+.icon-button.long-press-hint::after {
+    content: "Long-press for iOS save";
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: #86868b;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.icon-button.long-press-hint:hover::after {
+    opacity: 1;
+}
+
+@keyframes pulse {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 0 8px rgba(255, 59, 48, 0);
+        transform: scale(1.02);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(255, 59, 48, 0);
+        transform: scale(1);
+    }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    .letter {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+    
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .input-field,
+    .icon-button,
+    .control-input,
+    .control-select {
+        border-width: 2px;
+    }
+    
+    .letter {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 1);
+    }
+}
+
+/* Focus visible for keyboard navigation */
+.input-field:focus-visible,
+.animate-button:focus-visible,
+.icon-button:focus-visible,
+.control-input:focus-visible,
+.control-select:focus-visible {
+    outline: 2px solid #007aff;
+    outline-offset: 2px;
+}
+
+/* Screen reader only content */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Skip link for keyboard navigation */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #007aff;
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: top 0.3s;
+}
+
+.skip-link:focus {
+    top: 6px;
+}

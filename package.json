@@ -1,0 +1,53 @@
+{
+  "name": "letter-motion",
+  "version": "1.1.0",
+  "description": "A captivating text animation inspired from Kalki 2898 AD movie title - watch letters transform through different writing systems",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "dev": "python3 -m http.server 3000",
+    "serve": "python3 -m http.server",
+    "build": "echo 'No build process needed for static files'",
+    "lint": "echo 'Add ESLint configuration for linting'",
+    "test": "echo 'Add testing framework for unit tests'",
+    "preview": "python3 -m http.server 8080",
+    "deploy": "echo 'Configure deployment to your preferred hosting service'"
+  },
+  "keywords": [
+    "animation",
+    "text",
+    "typography",
+    "javascript",
+    "css",
+    "multi-language",
+    "creative",
+    "kalki",
+    "letter-animation",
+    "video-recording",
+    "canvas",
+    "accessibility"
+  ],
+  "author": {
+    "name": "Emmanuel Mavely",
+    "url": "https://github.com/emmanuelmavely"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emmanuelmavely/letter-motion.git"
+  },
+  "bugs": {
+    "url": "https://github.com/emmanuelmavely/letter-motion/issues"
+  },
+  "homepage": "https://github.com/emmanuelmavely/letter-motion#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "devDependencies": {},
+  "dependencies": {}
+}
